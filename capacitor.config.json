@@ -1,0 +1,7 @@
+{
+  "appId": "com.huefit.app",
+  "appName": "HueFit",
+  "webDir": "www",
+  "backgroundColor": "#FAF8F4",
+  "android": { "allowMixedContent": false }
+}

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF8F4">
+<title>HueFit</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1F2A44"/><circle cx="12" cy="13" r="6" fill="#C19A6B"/><circle cx="20" cy="13" r="6" fill="#9CAF88" fill-opacity=".9"/><circle cx="16" cy="20" r="6" fill="#B5603A" fill-opacity=".9"/></svg>
+    <div><h1>HueFit</h1><p>Pick your bottoms. Get the right tops.</p></div>
+  </div>
+</header>
+
+<main>
+  <section class="panel" aria-label="Style">
+    <div class="field"><label class="lbl" for="garment">Garment</label><div class="seg" id="garment" role="radiogroup" aria-label="Garment type"></div></div>
+    <div class="field"><span class="lbl">Formality</span><div class="seg" id="formality" role="radiogroup" aria-label="Formality"></div></div>
+  </section>
+
+  <details class="panel profile" id="profileBox">
+    <summary>Your profile, season &amp; climate <small>optional · makes results personal</small></summary>
+    <div class="pgrid">
+      <div class="field"><span class="lbl">Skin tone</span><div class="seg wrapseg" id="skin" role="radiogroup" aria-label="Skin tone"></div></div>
+      <div class="field"><span class="lbl">Undertone</span><div class="seg" id="undertone" role="radiogroup" aria-label="Undertone"></div>
+        <p class="hint">Gold jewellery suits you = warm. Silver = cool. Both = neutral.</p></div>
+      <div class="field"><span class="lbl">Hair colour</span><div class="seg wrapseg" id="hair" role="radiogroup" aria-label="Hair colour"></div></div>
+      <div class="field"><span class="lbl">Season</span><div class="seg" id="season" role="radiogroup" aria-label="Season"></div>
+        <p class="hint">Pick the season you are in now. Tap a profile option again to clear it.</p></div>
+      <div class="field"><span class="lbl">Climate</span><div class="seg" id="climate" role="radiogroup" aria-label="Climate"></div>
+        <p class="hint">Changes fabric weight and shoe suggestions.</p></div>
+    </div>
+  </details>
+
+  <nav class="tabs" role="tablist" aria-label="Mode">
+    <button role="tab" data-tab="outfits" aria-selected="true">Find tops</button>
+    <button role="tab" data-tab="tops" aria-selected="false">Match a top</button>
+    <button role="tab" data-tab="wardrobe" aria-selected="false">My wardrobe</button>
+  </nav>
+
+  <section id="tab-outfits" role="tabpanel">
+    <div class="panel single"><div class="field"><span class="lbl">Bottom colour</span><div id="bottomInput"></div></div></div>
+    <div id="outfitsResults" aria-live="polite"></div>
+  </section>
+
+  <section id="tab-tops" role="tabpanel" hidden>
+    <div class="panel single"><div class="field"><span class="lbl">Top colour you have</span><div id="topInput"></div></div></div>
+    <div id="topsResults" aria-live="polite"></div>
+  </section>
+
+  <section id="tab-wardrobe" role="tabpanel" hidden>
+    <div class="panel single">
+      <div class="field"><span class="lbl">Add to your wardrobe</span>
+        <div class="seg" id="wardKind" role="radiogroup" aria-label="Item type"></div>
+        <input type="text" id="wardName" class="wname" maxlength="40" placeholder="Name (optional), e.g. Grey Uniqlo polo" aria-label="Item name">
+        <div id="wardColour"></div>
+        <div class="row"><span class="big sm" id="wardPreview" style="background:#EEE"></span><button type="button" class="btn" id="wardAdd">Add item</button></div>
+      </div>
+    </div>
+    <div id="wardList" aria-live="polite"></div>
+  </section>
+
+  <section id="favSection" class="fav-section" hidden>
+    <h2>Saved looks</h2>
+    <div id="favList" class="chips"></div>
+  </section>
+</main>
+
+<footer><p>Tap a swatch to copy its hex. Tap the heart to save a pairing. Everything stays on your device and works offline.</p></footer>
+<script src="engine.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
