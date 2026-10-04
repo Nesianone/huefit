@@ -14,6 +14,9 @@
   let profile = Object.assign({ skin: null, undertone: null, hair: null, season: 'any', climate: 'mild' }, store.get('profile', {}));
   let wardrobe = Object.assign({ tops: [], bottoms: [] }, store.get('wardrobe', {}));
   let favs = store.get('favs', []);
+  let belts = store.get('belts', ['brn-belt', 'blk-belt', 'blk-canvas', 'grey-canvas']);
+  let watches = store.get('watches', []);
+  if (!Array.isArray(belts)) belts = []; if (!Array.isArray(watches)) watches = [];
   let shoes = store.get('shoes', []);
   if (!Array.isArray(shoes)) shoes = [];
   if (!Array.isArray(favs)) favs = [];
@@ -163,10 +166,11 @@
         <div class="pair">${mini(item.hex, res.bottom.hex)}<p>${esc(item.why)}</p></div>
         <p class="meta"><b>Wear:</b> ${item.pieces.map(esc).join(' · ')}</p>
         <p class="meta"><b>Shoes:</b> ${esc(item.shoes)}</p>${item.shoeNote ? `<p class="meta shoenote">${esc(item.shoeNote)}</p>` : ''}
+        <p class="meta"><b>Belt:</b> ${esc(item.belt)}</p>${item.beltNote ? `<p class="meta shoenote">${esc(item.beltNote)}</p>` : ''}${item.watch ? `<p class="meta"><b>Watch:</b> ${esc(item.watch)}</p>` : ''}
       </div></article>`;
   }
   function renderOutfits() {
-    const res = E.recommend({ bottomKey: state.bottom.key, customHex: state.bottom.hex, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate, ownedShoes: shoes });
+    const res = E.recommend({ bottomKey: state.bottom.key, customHex: state.bottom.hex, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate, ownedShoes: shoes, ownedBelts: belts, ownedWatches: watches });
     let h = `<div class="summary"><span class="big" style="background:${res.bottom.hex}"></span>
       <div><h2>${esc(res.bottom.name)} ${esc(res.garment.toLowerCase())}</h2><p>${esc(res.formality)} · ${res.bottom.hex}</p></div></div>${rankBanner(res.ranked)}`;
     res.categories.forEach(c => { h += `<h2>${esc(c.title)}</h2><p class="sub">${esc(c.sub)}</p><div class="grid">${c.items.map(i => topCard(i, res)).join('')}</div>`; });
@@ -187,11 +191,12 @@
         <div class="pair">${mini(res.top.hex, item.hex)}<p>${esc(item.why)}</p></div>
         <p class="meta"><b>Top:</b> ${item.pieces.map(esc).join(' · ')}</p>
         <p class="meta"><b>Shoes:</b> ${esc(item.shoes)}</p>${item.shoeNote ? `<p class="meta shoenote">${esc(item.shoeNote)}</p>` : ''}
+        <p class="meta"><b>Belt:</b> ${esc(item.belt)}</p>${item.beltNote ? `<p class="meta shoenote">${esc(item.beltNote)}</p>` : ''}${item.watch ? `<p class="meta"><b>Watch:</b> ${esc(item.watch)}</p>` : ''}
       </div></article>`;
   }
   function renderTops() {
     const t = state.top.key ? E.TOPS.find(x => x.key === state.top.key) : { name: null, hex: state.top.hex };
-    const res = E.recommendBottoms({ topHex: t.hex, topName: t.name, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate, ownedShoes: shoes });
+    const res = E.recommendBottoms({ topHex: t.hex, topName: t.name, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate, ownedShoes: shoes, ownedBelts: belts, ownedWatches: watches });
     const fitNote = res.fit.note === 'flatter' ? '<div class="tip good"><b>Flatters you:</b> this top has strong contrast with your skin tone.</div>'
       : res.fit.note === 'wash' ? '<div class="tip warn-tip"><b>Heads up:</b> this top is close to your skin tone in depth and may wash you out near your face.</div>' : '';
     let h = `<div class="summary"><span class="big" style="background:${res.top.hex}"></span>
@@ -255,6 +260,15 @@
     store.set('shoes', shoes); drawShoes(); renderActive();
   });
 
+  function drawAcc() {
+    $('beltList').innerHTML = E.BELTS.map(b => `<button type="button" role="checkbox" aria-checked="${belts.includes(b.id)}" data-belt="${b.id}">${esc(b.name)}</button>`).join('');
+    $('watchList').innerHTML = E.WATCHES.map(w => `<button type="button" role="checkbox" aria-checked="${watches.includes(w.id)}" data-watch="${w.id}">${esc(w.name)}</button>`).join('');
+    $('accCount').textContent = belts.length + ' belt' + (belts.length === 1 ? '' : 's') + (watches.length ? ', ' + watches.length + ' watch' + (watches.length === 1 ? '' : 'es') : ', no watch');
+  }
+  const toggle = (arr, id) => arr.includes(id) ? arr.filter(x => x !== id) : arr.concat(id);
+  $('beltList').addEventListener('click', e => { const b = e.target.closest('[data-belt]'); if (!b) return; belts = toggle(belts, b.dataset.belt); store.set('belts', belts); drawAcc(); renderActive(); });
+  $('watchList').addEventListener('click', e => { const b = e.target.closest('[data-watch]'); if (!b) return; watches = toggle(watches, b.dataset.watch); store.set('watches', watches); drawAcc(); renderActive(); });
+
   /* ---------- tabs & global render ---------- */
   function renderActive() {
     if (state.tab === 'outfits') renderOutfits();
@@ -297,6 +311,7 @@
   colourInput($('topInput'), E.TOPS, state.top.key, c => { state.top = c; renderActive(); });
   buildWardrobeForm();
   drawShoes();
+  drawAcc();
   setTab('outfits');
 
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
