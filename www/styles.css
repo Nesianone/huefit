@@ -114,3 +114,9 @@ button:focus-visible,input:focus-visible{outline:3px solid #7A8FC7;outline-offse
 .samp .sw{width:40px;height:40px;border-radius:10px;background:#eee;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
 .btn[disabled]{opacity:.5}
 @media(min-width:720px){.pgrid{grid-template-columns:1fr 1fr}.profile .field:nth-child(1),.profile .field:nth-child(3){grid-column:1 / -1}}
+
+.pgrid.one{grid-template-columns:1fr!important}
+.seg.multi button[aria-checked="true"]{background:#1F2A44;color:#fff;font-weight:600}
+.seg.wrapseg button{flex:0 1 auto}
+.shoenote{color:var(--warn);font-size:.8rem}
+.tip.buy{background:#FFF3D6}

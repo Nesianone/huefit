@@ -470,8 +470,72 @@
   }
   const isRanked = (p, season) => !!(p && (p.skin || p.undertone === 'warm' || p.undertone === 'cool' || p.hair)) || (season && season !== 'any');
 
+  /* ---------- Shoes (owned-shoe matching) ---------- */
+  const SHOES = [
+    { id: 'wht-leather', name: 'White leather sneakers', fam: 'white', f: 1, c: [0, .3, -.2] },
+    { id: 'wht-canvas', name: 'White canvas sneakers', fam: 'white', f: 0, c: [.3, .2, -.5] },
+    { id: 'blk-sneak', name: 'Black sneakers', fam: 'black', f: 0, c: [0, .2, .2] },
+    { id: 'grey-sneak', name: 'Grey sneakers', fam: 'grey', f: .3, c: [0, .2, .2] },
+    { id: 'trainers', name: 'Running / gym trainers', fam: 'grey', f: 0, c: [0, 0, 0], g: { 'Tailored Trousers': -2, 'Chinos': -.5, 'Jeans': -.3 } },
+    { id: 'boat', name: 'Boat shoes', fam: 'tan', f: .8, c: [.5, .3, -.8] },
+    { id: 'brn-loafer', name: 'Brown leather loafers', fam: 'brown', f: 1.5, c: [.3, .2, -.2] },
+    { id: 'blk-loafer', name: 'Black leather loafers', fam: 'black', f: 1.6, c: [0, 0, .1] },
+    { id: 'brn-derby', name: 'Brown leather dress shoes', fam: 'brown', f: 2, c: [-.8, 0, .3], g: { 'Dress Shorts': -1.2 } },
+    { id: 'blk-derby', name: 'Black leather dress shoes', fam: 'black', f: 2, c: [-.8, 0, .3], g: { 'Dress Shorts': -1.5 } },
+    { id: 'chukka', name: 'Suede desert boots / chukkas', fam: 'tan', f: 1.2, c: [-1, -.1, .6], g: { 'Dress Shorts': -1 } },
+    { id: 'brn-boot', name: 'Brown leather boots', fam: 'brown', f: 1, c: [-1.5, -.2, .7], g: { 'Dress Shorts': -1.5 } },
+    { id: 'blk-boot', name: 'Black leather boots', fam: 'black', f: 1, c: [-1.5, -.2, .7], g: { 'Dress Shorts': -1.5 } },
+    { id: 'work-boot', name: 'Work boots', fam: 'brown', f: 0, c: [-1.5, -.3, .4], g: { 'Dress Shorts': -1.2, 'Tailored Trousers': -2, 'Chinos': -.4 } },
+    { id: 'sandal', name: 'Leather sandals', fam: 'tan', f: .5, c: [.7, 0, -1.5], g: { 'Tailored Trousers': -2, 'Chinos': -.6, 'Jeans': -.4 } },
+    { id: 'jandals', name: 'Jandals', fam: 'black', f: 0, c: [.6, -.2, -2], g: { 'Tailored Trousers': -2.5, 'Chinos': -1, 'Jeans': -.6, 'Dress Shorts': -.4 } }
+  ];
+  // how well each shoe colour family sits with each bottom (0 = poor, 2 = ideal)
+  const SHOE_COMPAT = {
+    navy:     { brown: 2, tan: 2, white: 2, grey: 1, black: .5 },
+    khaki:    { brown: 2, tan: 1, white: 2, grey: 1, black: .5 },
+    olive:    { brown: 2, tan: 2, white: 1.5, grey: 1, black: 1 },
+    charcoal: { black: 2, brown: 1.5, white: 2, grey: 1.5, tan: 1 },
+    stone:    { brown: 2, tan: 1.5, white: 1.5, grey: 1, black: 1.5 },
+    black:    { black: 2, white: 2, grey: 1.5, brown: 1, tan: .5 },
+    tobacco:  { brown: 1.5, tan: 1, white: 2, grey: 1.5, black: 1 },
+    burgundy: { brown: 2, tan: 1, white: 1.5, grey: 1.5, black: 1.5 },
+    denim:    { brown: 2, tan: 2, white: 2, grey: 1.5, black: 1 }
+  };
+  const SHOE_OK = 2.4;
+  function shoeScore(shoe, bottomHex, fm, clim, garment) {
+    const key = nearestPalette(bottomHex).key;
+    const target = fm === 'smart' ? 1.6 : .5;
+    const ci = { hot: 0, mild: 1, cool: 2 }[clim] ?? 1;
+    return (1.5 - Math.abs(target - shoe.f) * 1.2) + (SHOE_COMPAT[key][shoe.fam] || 0) + shoe.c[ci] + ((shoe.g && shoe.g[garment]) || 0);
+  }
+  function pickShoes({ owned, bottomHex, fm, clim, garment }) {
+    const list = SHOES.filter(s => owned.includes(s.id))
+      .map(s => ({ id: s.id, name: s.name, score: shoeScore(s, bottomHex, fm, clim, garment) }))
+      .sort((a, b) => b.score - a.score);
+    return list.filter((s, i) => i === 0 || s.score >= 2.2).slice(0, 2);
+  }
+  function shoeLine(base, owned, bottomHex, fm, clim, garment) {
+    if (!owned || !owned.length) return { text: base, note: null };
+    const picks = pickShoes({ owned, bottomHex, fm, clim, garment });
+    if (!picks.length) return { text: base, note: null };
+    return { text: picks.map(p => p.name).join(' or '), note: picks[0].score < SHOE_OK ? 'Not ideal. A better match would be ' + base.toLowerCase() + ', which you don’t have yet.' : null };
+  }
+  // which shoe to buy next: biggest total improvement across the given bottoms
+  function shoeGaps({ owned, bottomHexes, garment, climate }) {
+    const clim = climate || 'mild';
+    const best = {};
+    const combos = [];
+    ['smart', 'relaxed'].forEach(fm => bottomHexes.forEach(h => combos.push([fm, h])));
+    const cur = combos.map(([fm, h]) => Math.max(0, ...SHOES.filter(s => owned.includes(s.id)).map(s => shoeScore(s, h, fm, clim, garment))));
+    return SHOES.filter(s => !owned.includes(s.id)).map(s => {
+      let gain = 0;
+      combos.forEach(([fm, h], i) => { gain += Math.max(0, shoeScore(s, h, fm, clim, garment) - Math.max(cur[i], owned.length ? 0 : SHOE_OK - .01)); });
+      return { id: s.id, name: s.name, gain };
+    }).sort((a, b) => b.gain - a.gain).filter(x => x.gain > 0.5).slice(0, 2);
+  }
+
   /* ---------- Bottoms -> tops ---------- */
-  function recommend({ bottomKey, customHex, garment, formality, profile, season, climate }) {
+  function recommend({ bottomKey, customHex, garment, formality, profile, season, climate, ownedShoes }) {
     const fm = formality === 'Relaxed Casual' ? 'relaxed' : 'smart';
     const clim = climate || 'mild';
     const bottom = bottomKey && BOTTOMS[bottomKey] ? BOTTOMS[bottomKey] : generateBottom(normHex(customHex) || '#1F2A44');
@@ -479,10 +543,11 @@
     const decorate = (list) => {
       let items = list.map((r, i) => {
         const fit = fitScore(r.hex, profile, season);
+        const sh = shoeLine(shoeFor(bottom.shoes[fm][i % bottom.shoes[fm].length], clim), ownedShoes, bottom.hex, fm, clim, garment);
         return {
           name: r.name, hex: r.hex, why: r.why,
           pieces: pieces(r.kinds, fm, clim),
-          shoes: shoeFor(bottom.shoes[fm][i % bottom.shoes[fm].length], clim),
+          shoes: sh.text, shoeNote: sh.note,
           score: fit.sc, note: fit.note
         };
       });
@@ -503,7 +568,7 @@
   }
 
   /* ---------- Tops -> bottoms ---------- */
-  function recommendBottoms({ topHex, topName, garment, formality, profile, season, climate }) {
+  function recommendBottoms({ topHex, topName, garment, formality, profile, season, climate, ownedShoes }) {
     const fm = formality === 'Relaxed Casual' ? 'relaxed' : 'smart';
     const clim = climate || 'mild';
     const hex = normHex(topHex) || '#FFFFFF';
@@ -511,7 +576,8 @@
     Object.entries(BOTTOMS).forEach(([k, b]) => {
       const r = relate(hex, b);
       const kinds = (r.item && r.item.kinds) || ['polo', 'oxford'];
-      g[r.rel].push({ key: k, name: b.name, hex: b.hex, rel: r.rel, d: r.d, why: r.why, pieces: pieces(kinds, fm, clim), shoes: shoeFor(b.shoes[fm][0], clim) });
+      const sh = shoeLine(shoeFor(b.shoes[fm][0], clim), ownedShoes, b.hex, fm, clim, garment);
+      g[r.rel].push({ key: k, name: b.name, hex: b.hex, rel: r.rel, d: r.d, why: r.why, pieces: pieces(kinds, fm, clim), shoes: sh.text, shoeNote: sh.note });
     });
     const defs = [
       ['classic', 'Safest bottoms', 'Reliable, high-contrast or neutral pairings.'],
@@ -542,7 +608,7 @@
 
   const engine = {
     recommend, recommendBottoms, wardrobeMatches, relate, dist, bottomFor, fitScore, normHex, nameColour,
-    BOTTOMS, TOPS, SKIN, HAIR, SEASONS, CLIMATES, GARMENTS, FORMALITY, REL_LABEL, hexHsl, hslToHex
+    BOTTOMS, TOPS, SHOES, pickShoes, shoeGaps, SKIN, HAIR, SEASONS, CLIMATES, GARMENTS, FORMALITY, REL_LABEL, hexHsl, hslToHex
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = engine;
   root.HueFitEngine = engine;

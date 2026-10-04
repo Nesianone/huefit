@@ -14,6 +14,8 @@
   let profile = Object.assign({ skin: null, undertone: null, hair: null, season: 'any', climate: 'mild' }, store.get('profile', {}));
   let wardrobe = Object.assign({ tops: [], bottoms: [] }, store.get('wardrobe', {}));
   let favs = store.get('favs', []);
+  let shoes = store.get('shoes', []);
+  if (!Array.isArray(shoes)) shoes = [];
   if (!Array.isArray(favs)) favs = [];
 
   /* ---------- helpers ---------- */
@@ -160,11 +162,11 @@
         ${badges(item.note, owned(item.hex))}
         <div class="pair">${mini(item.hex, res.bottom.hex)}<p>${esc(item.why)}</p></div>
         <p class="meta"><b>Wear:</b> ${item.pieces.map(esc).join(' · ')}</p>
-        <p class="meta"><b>Shoes:</b> ${esc(item.shoes)}</p>
+        <p class="meta"><b>Shoes:</b> ${esc(item.shoes)}</p>${item.shoeNote ? `<p class="meta shoenote">${esc(item.shoeNote)}</p>` : ''}
       </div></article>`;
   }
   function renderOutfits() {
-    const res = E.recommend({ bottomKey: state.bottom.key, customHex: state.bottom.hex, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate });
+    const res = E.recommend({ bottomKey: state.bottom.key, customHex: state.bottom.hex, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate, ownedShoes: shoes });
     let h = `<div class="summary"><span class="big" style="background:${res.bottom.hex}"></span>
       <div><h2>${esc(res.bottom.name)} ${esc(res.garment.toLowerCase())}</h2><p>${esc(res.formality)} · ${res.bottom.hex}</p></div></div>${rankBanner(res.ranked)}`;
     res.categories.forEach(c => { h += `<h2>${esc(c.title)}</h2><p class="sub">${esc(c.sub)}</p><div class="grid">${c.items.map(i => topCard(i, res)).join('')}</div>`; });
@@ -184,12 +186,12 @@
         <div class="badges"><span class="badge rel-${item.rel}">${esc(E.REL_LABEL[item.rel])}</span></div>
         <div class="pair">${mini(res.top.hex, item.hex)}<p>${esc(item.why)}</p></div>
         <p class="meta"><b>Top:</b> ${item.pieces.map(esc).join(' · ')}</p>
-        <p class="meta"><b>Shoes:</b> ${esc(item.shoes)}</p>
+        <p class="meta"><b>Shoes:</b> ${esc(item.shoes)}</p>${item.shoeNote ? `<p class="meta shoenote">${esc(item.shoeNote)}</p>` : ''}
       </div></article>`;
   }
   function renderTops() {
     const t = state.top.key ? E.TOPS.find(x => x.key === state.top.key) : { name: null, hex: state.top.hex };
-    const res = E.recommendBottoms({ topHex: t.hex, topName: t.name, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate });
+    const res = E.recommendBottoms({ topHex: t.hex, topName: t.name, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate, ownedShoes: shoes });
     const fitNote = res.fit.note === 'flatter' ? '<div class="tip good"><b>Flatters you:</b> this top has strong contrast with your skin tone.</div>'
       : res.fit.note === 'wash' ? '<div class="tip warn-tip"><b>Heads up:</b> this top is close to your skin tone in depth and may wash you out near your face.</div>' : '';
     let h = `<div class="summary"><span class="big" style="background:${res.top.hex}"></span>
@@ -220,6 +222,11 @@
     } else {
       h += '<div class="tip">Add at least one top and one bottom to see matches.</div>';
     }
+    const hexes = wardrobe.bottoms.length ? wardrobe.bottoms.map(b => b.hex) : Object.values(E.BOTTOMS).map(b => b.hex);
+    const gaps = E.shoeGaps({ owned: shoes, bottomHexes: hexes, garment: state.garment, climate: profile.climate });
+    if (gaps.length) {
+      h = `<div class="tip buy"><b>${shoes.length ? 'Worth buying next' : 'Good first pairs to get'}:</b> ${gaps.map(g => esc(g.name)).join(' and ')}. ${shoes.length ? 'They would improve the most outfits' : 'They suit the most outfits'}${wardrobe.bottoms.length ? ' with your bottoms' : ''}.</div>` + h;
+    }
     $('wardList').innerHTML = h;
   }
   function buildWardrobeForm() {
@@ -235,6 +242,18 @@
       toast('Added ' + item.name); renderWardrobe();
     });
   }
+
+  /* ---------- My shoes ---------- */
+  function drawShoes() {
+    $('shoeList').innerHTML = E.SHOES.map(s => `<button type="button" role="checkbox" aria-checked="${shoes.includes(s.id)}" data-shoe="${s.id}">${esc(s.name)}</button>`).join('');
+    $('shoeCount').textContent = shoes.length ? shoes.length + ' selected' : 'tick what you own';
+  }
+  $('shoeList').addEventListener('click', e => {
+    const b = e.target.closest('[data-shoe]'); if (!b) return;
+    const id = b.dataset.shoe;
+    shoes = shoes.includes(id) ? shoes.filter(x => x !== id) : shoes.concat(id);
+    store.set('shoes', shoes); drawShoes(); renderActive();
+  });
 
   /* ---------- tabs & global render ---------- */
   function renderActive() {
@@ -277,6 +296,7 @@
   colourInput($('bottomInput'), Object.entries(E.BOTTOMS).map(([key, b]) => ({ key, name: b.name, hex: b.hex })), state.bottom.key, c => { state.bottom = c; renderActive(); });
   colourInput($('topInput'), E.TOPS, state.top.key, c => { state.top = c; renderActive(); });
   buildWardrobeForm();
+  drawShoes();
   setTab('outfits');
 
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
