@@ -20,4 +20,26 @@ for(const h of ['#000000','#FFFFFF','#FF00FF','#808080','#6B7040']){const r=E.re
 const wm=E.wardrobeMatches({tops:[{name:'a',hex:'#F7F7F4'},{name:'b',hex:'#39FF14'}],bottoms:[{name:'x',hex:'#6B7040'},{name:'y',hex:'#123456'}]},P,'any');
 if(wm.length!==2||wm.some(m=>m.matches.length!==2)){console.log('wardrobe shape');bad++}
 if(wm[0].matches[0].top.name!=='a'){console.log('wardrobe order');bad++}
+
+// ---- colour-wheel cross-check (independent of the hand-written lists) ----
+function wheelClass(topHex,botHex){
+  const t=E.hexHsl(topHex),b=E.hexHsl(botHex);
+  let dh=Math.abs(t.h-b.h); dh=Math.min(dh,360-dh);
+  return {dh,ts:t.s,bs:b.s};
+}
+let wmiss=0;
+for(const [k,b] of Object.entries(E.BOTTOMS)){
+  if(E.hexHsl(b.hex).s<.12) continue;               // neutral base: wheel has no hue to measure
+  for(const [cat,list] of [['classic',b.neutrals],['tonal',b.tonal],['comp',b.comp]]){
+    for(const it of list){
+      const w=wheelClass(it.hex,b.hex);
+      if(w.ts<.12) continue;                         // neutral top: judged on value contrast, not hue
+      if(cat==='classic' && w.ts<.45) continue;      // muted/pale colours behave as neutrals
+      if(cat==='tonal' && w.dh>50){console.log('WHEEL tonal too far:',k,it.name,Math.round(w.dh)+'deg');wmiss++}
+      if(cat==='comp' && w.dh<135){console.log('WHEEL contrast not opposite:',k,it.name,Math.round(w.dh)+'deg');wmiss++}
+      if(cat==='classic' && w.ts>=.45){console.log('WHEEL classic is strongly coloured:',k,it.name);wmiss++}
+    }
+  }
+}
+console.log(wmiss?('WHEEL CHECK: '+wmiss+' flagged'):'WHEEL CHECK OK');
 console.log(bad?('FAIL2 '+bad):'ALL OK 2');

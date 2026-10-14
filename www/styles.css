@@ -126,3 +126,10 @@ button:focus-visible,input:focus-visible{outline:3px solid #7A8FC7;outline-offse
 .avoid.care .sw::after{content:"";}
 .avoid.care span{color:#5b4f2a}
 .badge.rel-care{background:#FFF0C7;color:#7A5200}
+
+.prefs{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.pref{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font:inherit;font-size:.8rem;cursor:pointer;min-height:36px}
+.pref[aria-pressed="true"]{background:#1F2A44;color:#fff;border-color:#1F2A44}
+.pref.small{margin-top:6px;font-size:.78rem;padding:4px 10px;min-height:32px}
+.badge.rel-mine{background:#DDEBFF;color:#1F3F6B}
+.badge.rel-skip{background:#ECE9E2;color:#6B6F78}

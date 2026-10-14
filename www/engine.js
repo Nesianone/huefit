@@ -108,7 +108,7 @@
       ],
       comp: [
         R('Dusty Blue', '#6F8FAF', 'Blue opposes the yellow-orange of sand; a dusty version keeps it calm.', ['oxford', 'polo']),
-        R('Deep Burgundy', '#6D2433', 'A rich red-purple adds depth against the light, warm base.', ['knit', 'tee']),
+        R('Dusty Lavender', '#9A94B8', 'A muted blue-violet sits across the wheel from warm sand, giving a soft, distinctive contrast.', ['knit', 'tee']),
         R('Slate Teal', '#4F7C82', 'A cool blue-green gives clear contrast without brightness.', ['tee', 'linen'])
       ],
       avoid: [
@@ -128,12 +128,12 @@
       tonal: [
         R('Sage', '#A3B18A', 'A lighter, greyer green sits next to olive for a gentle monochrome.', ['linen', 'polo']),
         R('Khaki', '#C2B280', 'A yellow-brown neighbour keeps the palette earthy and warm.', ['polo', 'overshirt']),
-        R('Forest Green', '#2F4F3A', 'A deeper green adds depth while staying in the same family.', ['knit', 'tee'])
+        R('Deep Moss', '#46512F', 'A darker green-olive in the same hue family, so it reads as a clean tonal step down.', ['knit', 'tee'])
       ],
       comp: [
-        R('Deep Burgundy', '#6D2433', 'Red-purple opposes green; a deep, muted version feels rich rather than festive.', ['knit', 'polo']),
-        R('Dusty Rose', '#C99A9A', 'A soft pink-red gives complementary contrast with a gentle touch.', ['linen', 'tee']),
-        R('Aubergine', '#5B3A52', 'A dark plum adds contrast that suits olive’s depth.', ['knit', 'tee'])
+        R('Deep Indigo', '#2C3E6B', 'Blue-violet sits opposite yellow-green on the wheel, so a deep, muted indigo gives rich contrast without looking loud.', ['knit', 'polo']),
+        R('Slate Blue', '#5C7494', 'A softer blue is a split-complement of olive, giving clear contrast with a calm tone.', ['linen', 'tee']),
+        R('Dusty Lavender', '#9A94B8', 'A muted violet is almost directly opposite olive, a gentle accent that feels deliberate.', ['linen', 'polo'])
       ],
       avoid: [
         A('Neon Green', '#39FF14', 'A fluorescent green makes muted olive look dull and dirty.'),
@@ -176,12 +176,13 @@
       tonal: [
         R('Oatmeal', '#CBBFA6', 'A slightly deeper neutral gives gentle depth within the same family.', ['knit', 'linen']),
         R('Warm Cream', '#EFE6CF', 'A lighter warm cousin keeps the palette calm and cohesive.', ['linen', 'polo']),
-        R('Taupe', '#A39382', 'A mid-value grey-brown adds weight without breaking the tonal story.', ['tee', 'knit'])
+        R('Taupe', '#A39382', 'A mid-value grey-brown adds weight without breaking the tonal story.', ['tee', 'knit']),
+        R('Terracotta', '#B8654A', 'A clay tone sits next to stone on the wheel, so it is a warm accent rather than a contrast, and it makes pale stone look expensive.', ['tee', 'linen'])
       ],
       comp: [
         R('Dusty Sky Blue', '#8FAFCB', 'A soft blue gives gentle cool contrast against a warm neutral.', ['oxford', 'polo']),
-        R('Terracotta', '#B8654A', 'A clay tone is a warm accent that makes pale stone look expensive.', ['tee', 'linen']),
-        R('Forest Green', '#2F4F3A', 'A deep green provides clear, earthy contrast.', ['knit', 'polo'])
+        R('Slate Teal', '#4F7C82', 'A cool blue-green sits across the wheel from warm stone, giving clear contrast with a quiet tone.', ['tee', 'linen']),
+        R('Deep Indigo', '#2C3E6B', 'Deep blue sits opposite the warm yellow-orange of stone, giving clear, classic contrast.', ['knit', 'polo'])
       ],
       avoid: [
         A('Same-Shade Off-White', '#E6E0D0', 'A near-identical shade loses definition. Change the fabric or add a darker shoe and belt to give it shape.', true),
@@ -219,9 +220,10 @@
       neutrals: [
         R('Crisp White', '#F7F7F4', 'White pops cleanly against warm brown and keeps the look fresh.', ['oxford', 'tee']),
         R('Navy', '#1F2A44', 'Cool dark blue against warm brown is a timeless menswear pairing.', ['polo', 'knit']),
-        R('Warm Cream', '#EFE6CF', 'Cream sits harmoniously with the warm brown base.', ['linen', 'knit'])
+        R('Heather Grey', '#B5B8BF', 'A cool light grey gives clean contrast against warm brown.', ['knit', 'tee'])
       ],
       tonal: [
+        R('Warm Cream', '#EFE6CF', 'Cream is the same warm hue family as the brown, just much lighter, so it reads as a tonal pairing.', ['linen', 'knit']),
         R('Sand', '#D8C8A8', 'A lighter warm neutral stays in the same colour family.', ['linen', 'polo']),
         R('Camel', '#C19A6B', 'A lighter brown-orange makes a layered tonal story.', ['knit', 'overshirt']),
         R('Muted Rust', '#B5603A', 'A warmer, more saturated neighbour adds energy within the family.', ['tee', 'polo'])
@@ -252,7 +254,7 @@
         R('Aubergine', '#5B3A52', 'A purple neighbour adds depth without leaving the family.', ['knit', 'tee'])
       ],
       comp: [
-        R('Sage Green', '#9CAF88', 'Green opposes red; a soft sage keeps it refined.', ['linen', 'polo']),
+        R('Dusty Seafoam', '#8DB5A8', 'Blue-green sits opposite red-purple on the wheel; a soft seafoam keeps it refined.', ['linen', 'polo']),
         R('Forest Green', '#2F4F3A', 'A deep green is the rich complement to burgundy.', ['knit', 'polo']),
         R('Muted Teal', '#4F7C82', 'A cool blue-green gives clear contrast with a soft edge.', ['tee', 'knit'])
       ],
@@ -414,8 +416,10 @@
   }
   const bottomFor = hex => { const n = nearestPalette(hex); return n.d < .15 ? BOTTOMS[n.key] : generateBottom(hex); };
 
-  const REL_LABEL = { classic: 'Safe pairing', tonal: 'Tonal pairing', comp: 'Contrast pairing', neutral: 'Judgement call', care: 'Use with care', avoid: 'Avoid' };
-  const REL_SCORE = { classic: 3, tonal: 2.5, comp: 2, neutral: 1, care: .8, avoid: 0 };
+  const pairKey = (bottomHex, topHex) => String(bottomHex).toUpperCase() + '|' + String(topHex).toUpperCase();
+  const prefOf = (ov, bottomHex, topHex) => { const o = ov && ov[pairKey(bottomHex, topHex)]; return o ? o.v : null; };
+  const REL_LABEL = { classic: 'Safe pairing', tonal: 'Tonal pairing', comp: 'Contrast pairing', neutral: 'Judgement call', care: 'Use with care', avoid: 'Avoid', mine: 'Your pick', skip: 'You skip' };
+  const REL_SCORE = { classic: 3, tonal: 2.5, comp: 2, neutral: 1, care: .8, avoid: 0, mine: 4, skip: -1 };
 
   function similar(a, b) {
     const x = hexHsl(a), y = hexHsl(b);
@@ -624,7 +628,7 @@
   }
 
   /* ---------- Bottoms -> tops ---------- */
-  function recommend({ bottomKey, customHex, garment, formality, profile, season, climate, ownedShoes, ownedBelts, ownedWatches }) {
+  function recommend({ bottomKey, customHex, garment, formality, profile, season, climate, ownedShoes, ownedBelts, ownedWatches, overrides }) {
     const fm = formality === 'Relaxed Casual' ? 'relaxed' : 'smart';
     const clim = climate || 'mild';
     const bottom = bottomKey && BOTTOMS[bottomKey] ? BOTTOMS[bottomKey] : generateBottom(normHex(customHex) || '#1F2A44');
@@ -639,10 +643,11 @@
           pieces: pieces(r.kinds, fm, clim),
           shoes: sh.text, shoeNote: sh.note,
           belt: acc.belt.text, beltNote: acc.belt.note, watch: acc.watch,
-          score: fit.sc, note: fit.note
+          score: fit.sc, note: fit.note, pref: prefOf(overrides, bottom.hex, r.hex)
         };
       });
-      if (ranked) items = items.map((x, i) => ({ x, i })).sort((a, b) => b.x.score - a.x.score || a.i - b.i).map(o => o.x);
+      const pw = x => x.pref === 'like' ? 1 : x.pref === 'dislike' ? -1 : 0;
+      if (ranked || items.some(x => x.pref)) items = items.map((x, i) => ({ x, i })).sort((a, b) => pw(b.x) - pw(a.x) || (ranked ? b.x.score - a.x.score : 0) || a.i - b.i).map(o => o.x);
       return items;
     };
     return {
@@ -654,31 +659,36 @@
         { id: 'tonal', title: 'Harmonious & Tonal', sub: 'Colour-wheel neighbours or shades of the base hue.', items: decorate(bottom.tonal) },
         { id: 'comp', title: 'Complementary Contrast', sub: 'Opposite or split-complement pairings, toned for menswear.', items: decorate(bottom.comp) }
       ],
-      avoid: bottom.avoid.filter(a => !a.soft),
-      care: bottom.avoid.filter(a => a.soft)
+      avoid: bottom.avoid.filter(a => !a.soft).map(a => Object.assign({}, a, { pref: prefOf(overrides, bottom.hex, a.hex) })),
+      care: bottom.avoid.filter(a => a.soft).map(a => Object.assign({}, a, { pref: prefOf(overrides, bottom.hex, a.hex) }))
     };
   }
 
   /* ---------- Tops -> bottoms ---------- */
-  function recommendBottoms({ topHex, topName, garment, formality, profile, season, climate, ownedShoes, ownedBelts, ownedWatches }) {
+  function recommendBottoms({ topHex, topName, garment, formality, profile, season, climate, ownedShoes, ownedBelts, ownedWatches, overrides }) {
     const fm = formality === 'Relaxed Casual' ? 'relaxed' : 'smart';
     const clim = climate || 'mild';
     const hex = normHex(topHex) || '#FFFFFF';
-    const g = { classic: [], tonal: [], comp: [], neutral: [], care: [], avoid: [] };
+    const g = { mine: [], classic: [], tonal: [], comp: [], neutral: [], care: [], avoid: [], skip: [] };
     Object.entries(BOTTOMS).forEach(([k, b]) => {
-      const r = relate(hex, b);
+      let r = relate(hex, b);
+      const pf = prefOf(overrides, b.hex, hex);
+      if (pf === 'like') r = { rel: 'mine', d: r.d, item: r.item, why: 'You marked this pairing as working for you.' };
+      else if (pf === 'dislike') r = { rel: 'skip', d: r.d, item: r.item, why: 'You marked this pairing as not for you.' };
       const kinds = (r.item && r.item.kinds) || ['polo', 'oxford'];
       const sh = shoeLine(shoeFor(b.shoes[fm][0], clim), ownedShoes, b.hex, fm, clim, garment);
       const acc = accessories(sh, { bottomHex: b.hex, fm, ownedBelts, ownedWatches, profile });
       g[r.rel].push({ key: k, name: b.name, hex: b.hex, rel: r.rel, d: r.d, why: r.why, pieces: pieces(kinds, fm, clim), shoes: sh.text, shoeNote: sh.note, belt: acc.belt.text, beltNote: acc.belt.note, watch: acc.watch });
     });
     const defs = [
+      ['mine', 'Your picks', 'Pairings you marked as working for you.'],
       ['classic', 'Safest bottoms', 'Reliable, high-contrast or neutral pairings.'],
       ['tonal', 'Tonal bottoms', 'Same family or neighbouring hues.'],
       ['comp', 'Contrast bottoms', 'Opposite-side colours, toned for menswear.'],
       ['neutral', 'Judgement calls', 'Not clearly good or bad. Try them in daylight.'],
       ['care', 'Use with care', 'Low contrast or near-match. They can work with different fabrics or a lighter accessory.'],
-      ['avoid', 'Bottoms to avoid', 'These clash with or wash out this top.']
+      ['avoid', 'Bottoms to avoid', 'These clash with this top.'],
+      ['skip', 'You skip these', 'Pairings you marked as not for you.']
     ];
     return {
       top: { name: topName || nameColour(hex), hex },
@@ -689,11 +699,14 @@
   }
 
   /* ---------- Wardrobe ---------- */
-  function wardrobeMatches(w, profile, season) {
+  function wardrobeMatches(w, profile, season, overrides) {
     return ((w && w.bottoms) || []).map(b => {
       const bb = bottomFor(b.hex);
       const matches = ((w && w.tops) || []).map(t => {
-        const r = relate(t.hex, bb), f = fitScore(t.hex, profile, season);
+        let r = relate(t.hex, bb); const f = fitScore(t.hex, profile, season);
+        const pf = prefOf(overrides, b.hex, t.hex);
+        if (pf === 'like') r = { rel: 'mine', why: 'You marked this pairing as working for you.' };
+        else if (pf === 'dislike') r = { rel: 'skip', why: 'You marked this pairing as not for you.' };
         return { top: t, rel: r.rel, why: r.why, score: REL_SCORE[r.rel] + f.sc * .3, note: f.note };
       }).sort((x, y) => y.score - x.score);
       return { bottom: b, matches };
@@ -702,7 +715,7 @@
 
   const engine = {
     recommend, recommendBottoms, wardrobeMatches, relate, dist, bottomFor, fitScore, normHex, nameColour,
-    BOTTOMS, TOPS, SHOES, BELTS, WATCHES, pickShoes, shoeGaps, SKIN, HAIR, SEASONS, CLIMATES, GARMENTS, FORMALITY, REL_LABEL, hexHsl, hslToHex
+    BOTTOMS, TOPS, SHOES, BELTS, WATCHES, pairKey, pickShoes, shoeGaps, SKIN, HAIR, SEASONS, CLIMATES, GARMENTS, FORMALITY, REL_LABEL, hexHsl, hslToHex
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = engine;
   root.HueFitEngine = engine;

@@ -17,6 +17,8 @@
   let belts = store.get('belts', ['brn-belt', 'blk-belt', 'blk-canvas', 'grey-canvas']);
   let watches = store.get('watches', []);
   if (!Array.isArray(belts)) belts = []; if (!Array.isArray(watches)) watches = [];
+  let overrides = store.get('overrides', {});
+  if (!overrides || typeof overrides !== 'object' || Array.isArray(overrides)) overrides = {};
   let shoes = store.get('shoes', []);
   if (!Array.isArray(shoes)) shoes = [];
   if (!Array.isArray(favs)) favs = [];
@@ -156,28 +158,38 @@
   const rankBanner = ranked => ranked ? '<div class="tip"><b>Ranked for you.</b> Your profile and season reorder each row, best first. Colours near your face matter most.</div>' : '';
 
   /* ---------- Outfits tab (bottoms -> tops) ---------- */
+  /* ---------- overrides: "this works / doesn't work for me" ---------- */
+  const prefFor = (b, t) => { const o = overrides[E.pairKey(b, t)]; return o ? o.v : null; };
+  const prefData = (b, t, bn, tn, v) => esc(JSON.stringify({ b, t, bn, tn, v }));
+  function prefRow(b, t, bn, tn) {
+    const p = prefFor(b, t);
+    return `<div class="prefs"><button type="button" class="pref" aria-pressed="${p === 'like'}" data-pref="${prefData(b, t, bn, tn, 'like')}">👍 Works for me</button><button type="button" class="pref" aria-pressed="${p === 'dislike'}" data-pref="${prefData(b, t, bn, tn, 'dislike')}">👎 Not for me</button></div>`;
+  }
+  const rowPref = (b, t, bn, tn) => `<button type="button" class="pref small" aria-pressed="${prefFor(b, t) === 'like'}" data-pref="${prefData(b, t, bn, tn, 'like')}">${prefFor(b, t) === 'like' ? '👍 You like this' : '👍 Works for me'}</button>`;
+
   function topCard(item, res) {
     const fav = { id: favId(res.bottom.hex, item.hex, res.garment, res.formality), top: item.hex, topName: item.name, bottom: res.bottom.hex, bottomName: res.bottom.name };
     return `<article class="card">
       <button class="swatch" style="background:${item.hex}" data-copy="${item.hex}" aria-label="Copy ${esc(item.name)} hex ${item.hex}"><span>${item.hex}</span></button>
       <div class="body">
         <h3><span>${esc(item.name)}</span>${heart(fav)}</h3>
-        ${badges(item.note, owned(item.hex))}
+        ${badges(item.note, owned(item.hex))}${item.pref ? `<div class="badges"><span class="badge rel-${item.pref === 'like' ? 'mine' : 'skip'}">${item.pref === 'like' ? 'Your pick' : 'You skip this'}</span></div>` : ''}
         <div class="pair">${mini(item.hex, res.bottom.hex)}<p>${esc(item.why)}</p></div>
         <p class="meta"><b>Wear:</b> ${item.pieces.map(esc).join(' · ')}</p>
         <p class="meta"><b>Shoes:</b> ${esc(item.shoes)}</p>${item.shoeNote ? `<p class="meta shoenote">${esc(item.shoeNote)}</p>` : ''}
         <p class="meta"><b>Belt:</b> ${esc(item.belt)}</p>${item.beltNote ? `<p class="meta shoenote">${esc(item.beltNote)}</p>` : ''}${item.watch ? `<p class="meta"><b>Watch:</b> ${esc(item.watch)}</p>` : ''}
+        ${prefRow(res.bottom.hex, item.hex, res.bottom.name, item.name)}
       </div></article>`;
   }
   function renderOutfits() {
-    const res = E.recommend({ bottomKey: state.bottom.key, customHex: state.bottom.hex, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate, ownedShoes: shoes, ownedBelts: belts, ownedWatches: watches });
+    const res = E.recommend({ bottomKey: state.bottom.key, customHex: state.bottom.hex, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate, ownedShoes: shoes, ownedBelts: belts, ownedWatches: watches, overrides });
     let h = `<div class="summary"><span class="big" style="background:${res.bottom.hex}"></span>
       <div><h2>${esc(res.bottom.name)} ${esc(res.garment.toLowerCase())}</h2><p>${esc(res.formality)} · ${res.bottom.hex}</p></div></div>${rankBanner(res.ranked)}`;
     res.categories.forEach(c => { h += `<h2>${esc(c.title)}</h2><p class="sub">${esc(c.sub)}</p><div class="grid">${c.items.map(i => topCard(i, res)).join('')}</div>`; });
     if (res.care.length) h += `<h2>Use with care</h2><p class="sub">Low contrast or near-match. These can work if you handle them well.</p><div class="avoid care">` +
-      res.care.map(a => `<div class="item"><span class="sw" style="background:${a.hex}"></span><div><strong>${esc(a.name)}</strong><span>${esc(a.why)}</span></div></div>`).join('') + '</div>';
+      res.care.map(a => `<div class="item"><span class="sw" style="background:${a.hex}"></span><div><strong>${esc(a.name)}</strong><span>${esc(a.why)}</span>${rowPref(res.bottom.hex, a.hex, res.bottom.name, a.name)}</div></div>`).join('') + '</div>';
     h += `<h2>Colours to Avoid</h2><p class="sub">These clash with your bottoms.</p><div class="avoid">` +
-      res.avoid.map(a => `<div class="item"><span class="sw" style="background:${a.hex}"></span><div><strong>${esc(a.name)}</strong><span>${esc(a.why)}</span></div></div>`).join('') + '</div>';
+      res.avoid.map(a => `<div class="item"><span class="sw" style="background:${a.hex}"></span><div><strong>${esc(a.name)}</strong><span>${esc(a.why)}</span>${rowPref(res.bottom.hex, a.hex, res.bottom.name, a.name)}</div></div>`).join('') + '</div>';
     if (res.tip) h += `<div class="tip"><b>Fit tip:</b> ${esc(res.tip)}</div>`;
     $('outfitsResults').innerHTML = h;
   }
@@ -194,18 +206,19 @@
         <p class="meta"><b>Top:</b> ${item.pieces.map(esc).join(' · ')}</p>
         <p class="meta"><b>Shoes:</b> ${esc(item.shoes)}</p>${item.shoeNote ? `<p class="meta shoenote">${esc(item.shoeNote)}</p>` : ''}
         <p class="meta"><b>Belt:</b> ${esc(item.belt)}</p>${item.beltNote ? `<p class="meta shoenote">${esc(item.beltNote)}</p>` : ''}${item.watch ? `<p class="meta"><b>Watch:</b> ${esc(item.watch)}</p>` : ''}
+        ${prefRow(item.hex, res.top.hex, item.name, res.top.name)}
       </div></article>`;
   }
   function renderTops() {
     const t = state.top.key ? E.TOPS.find(x => x.key === state.top.key) : { name: null, hex: state.top.hex };
-    const res = E.recommendBottoms({ topHex: t.hex, topName: t.name, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate, ownedShoes: shoes, ownedBelts: belts, ownedWatches: watches });
+    const res = E.recommendBottoms({ topHex: t.hex, topName: t.name, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate, ownedShoes: shoes, ownedBelts: belts, ownedWatches: watches, overrides });
     const fitNote = res.fit.note === 'flatter' ? '<div class="tip good"><b>Flatters you:</b> this top has strong contrast with your skin tone.</div>'
       : res.fit.note === 'wash' ? '<div class="tip warn-tip"><b>Heads up:</b> this top is close to your skin tone in depth, so it may look flat near your face.</div>' : '';
     let h = `<div class="summary"><span class="big" style="background:${res.top.hex}"></span>
       <div><h2>Bottoms for ${esc(res.top.name)}</h2><p>${esc(res.formality)} · ${esc(res.garment.toLowerCase())} · ${res.top.hex}</p></div></div>${fitNote}`;
     res.groups.forEach(g => {
       if (g.id === 'avoid' || g.id === 'care') {
-        h += `<h2>${esc(g.title)}</h2><p class="sub">${esc(g.sub)}</p><div class="avoid${g.id === 'care' ? ' care' : ''}">` + g.items.map(a => `<div class="item"><span class="sw" style="background:${a.hex}"></span><div><strong>${esc(a.name)}</strong><span>${esc(a.why)}</span></div></div>`).join('') + '</div>';
+        h += `<h2>${esc(g.title)}</h2><p class="sub">${esc(g.sub)}</p><div class="avoid${g.id === 'care' ? ' care' : ''}">` + g.items.map(a => `<div class="item"><span class="sw" style="background:${a.hex}"></span><div><strong>${esc(a.name)}</strong><span>${esc(a.why)}</span>${rowPref(a.hex, res.top.hex, a.name, res.top.name)}</div></div>`).join('') + '</div>';
       } else {
         h += `<h2>${esc(g.title)}</h2><p class="sub">${esc(g.sub)}</p><div class="grid">${g.items.map(i => bottomCard(i, res)).join('')}</div>`;
       }
@@ -216,13 +229,13 @@
 
   /* ---------- Wardrobe tab ---------- */
   const wForm = { kind: 'top', hex: null, name: '' };
-  const REL_CHIP = { classic: 'Great', tonal: 'Great', comp: 'Good', neutral: 'OK', care: 'Careful', avoid: 'Avoid' };
+  const REL_CHIP = { classic: 'Great', tonal: 'Great', comp: 'Good', neutral: 'OK', care: 'Careful', avoid: 'Avoid', mine: 'Your pick', skip: 'Skip' };
   function renderWardrobe() {
     const list = (arr, kind) => arr.length ? arr.map((x, i) => `<button class="fav-chip" data-wdel="${kind}:${i}" aria-label="Remove ${esc(x.name)}"><span class="mini one" aria-hidden="true"><i style="background:${x.hex}"></i></span><span>${esc(x.name)}</span><span aria-hidden="true">✕</span></button>`).join('') : '<p class="sub">None yet.</p>';
     let h = `<h2>Your tops</h2><div class="chips">${list(wardrobe.tops, 'tops')}</div><h2>Your bottoms</h2><div class="chips">${list(wardrobe.bottoms, 'bottoms')}</div>`;
     if (wardrobe.tops.length && wardrobe.bottoms.length) {
       h += '<h2>Outfit matches</h2><p class="sub">Best pairings from what you already own, strongest first.</p>';
-      E.wardrobeMatches(wardrobe, profile, profile.season).forEach(g => {
+      E.wardrobeMatches(wardrobe, profile, profile.season, overrides).forEach(g => {
         h += `<div class="wcard"><div class="whead"><span class="big sm" style="background:${g.bottom.hex}"></span><strong>${esc(g.bottom.name)}</strong></div>` +
           g.matches.map(m => `<div class="wrow">${mini(m.top.hex, g.bottom.hex)}<div class="wtxt"><strong>${esc(m.top.name)}</strong><span>${esc(m.why)}</span></div><span class="badge rel-${m.rel}">${REL_CHIP[m.rel]}</span></div>`).join('') + '</div>';
       });
@@ -271,12 +284,21 @@
   $('beltList').addEventListener('click', e => { const b = e.target.closest('[data-belt]'); if (!b) return; belts = toggle(belts, b.dataset.belt); store.set('belts', belts); drawAcc(); renderActive(); });
   $('watchList').addEventListener('click', e => { const b = e.target.closest('[data-watch]'); if (!b) return; watches = toggle(watches, b.dataset.watch); store.set('watches', watches); drawAcc(); renderActive(); });
 
+  function renderOverrides() {
+    const keys = Object.keys(overrides);
+    $('ovCount').textContent = keys.length ? keys.length + ' saved' : 'none yet';
+    $('ovList').innerHTML = keys.length
+      ? keys.map(k => { const o = overrides[k]; return `<button class="fav-chip" data-ovdel="${esc(k)}" aria-label="Remove: ${esc(o.tn)} with ${esc(o.bn)}">${mini(o.t, o.b)}<span>${esc(o.tn)} + ${esc(o.bn)} · ${o.v === 'like' ? 'works for me' : 'not for me'}</span><span aria-hidden="true">✕</span></button>`; }).join('') + '<button type="button" class="btn ghost" id="ovClear">Clear all</button>'
+      : '<p class="sub">When you tap "Works for me" or "Not for me" on a pairing, it is saved here. Tap one to undo it.</p>';
+  }
+
   /* ---------- tabs & global render ---------- */
   function renderActive() {
     if (state.tab === 'outfits') renderOutfits();
     else if (state.tab === 'tops') renderTops();
     else renderWardrobe();
     renderFavs();
+    renderOverrides();
   }
   function setTab(t) {
     state.tab = t;
@@ -295,6 +317,15 @@
     }
     const del = e.target.closest('[data-del]');
     if (del) { favs = favs.filter(x => x.id !== del.dataset.del); store.set('favs', favs); renderActive(); return; }
+    const pf = e.target.closest('[data-pref]');
+    if (pf) {
+      const d = JSON.parse(pf.dataset.pref), k = E.pairKey(d.b, d.t);
+      if (overrides[k] && overrides[k].v === d.v) delete overrides[k]; else overrides[k] = d;
+      store.set('overrides', overrides); renderActive(); return;
+    }
+    const od = e.target.closest('[data-ovdel]');
+    if (od) { delete overrides[od.dataset.ovdel]; store.set('overrides', overrides); renderActive(); return; }
+    if (e.target.id === 'ovClear') { overrides = {}; store.set('overrides', overrides); renderActive(); return; }
     const wd = e.target.closest('[data-wdel]');
     if (wd) { const [k, i] = wd.dataset.wdel.split(':'); wardrobe[k].splice(+i, 1); store.set('wardrobe', wardrobe); renderActive(); }
   });
