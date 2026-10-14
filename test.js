@@ -5,7 +5,7 @@ function check(res,label){
   if(res.categories.length!==3) {console.log(label,'cats');bad++}
   res.categories.forEach(c=>{ if(c.items.length<3){console.log(label,c.id,'few');bad++}
     c.items.forEach(i=>{ if(!hexRe.test(i.hex)||!i.name||!i.why||!i.pieces.length||!i.shoes){console.log(label,c.id,JSON.stringify(i));bad++}})});
-  if(res.avoid.length<3||res.avoid.some(a=>!hexRe.test(a.hex))){console.log(label,'avoid',JSON.stringify(res.avoid));bad++}
+  if(res.avoid.length+res.care.length<3||res.avoid.length<1||[...res.avoid,...res.care].some(a=>!hexRe.test(a.hex))){console.log(label,'avoid',JSON.stringify(res.avoid));bad++}
 }
 for(const k of Object.keys(E.BOTTOMS)) for(const g of E.GARMENTS) for(const f of E.FORMALITY) check(E.recommend({bottomKey:k,garment:g,formality:f}),k+g+f);
 for(const h of ['#6B7040','#FFFFFF','#000000','#808080','#ff0000','#1f2a44','5C3A21','#C2B280']) check(E.recommend({customHex:h,garment:'Chinos',formality:'Smart Casual'}),'custom '+h);

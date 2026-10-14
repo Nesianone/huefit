@@ -66,7 +66,7 @@
   };
 
   const R = (name, hex, why, kinds) => ({ name, hex, why, kinds });
-  const A = (name, hex, why) => ({ name, hex, why });
+  const A = (name, hex, why, soft) => ({ name, hex, why, soft: !!soft });
 
   const BOTTOMS = {
     navy: {
@@ -88,7 +88,7 @@
         R('Dusty Terracotta', '#C98467', 'A clay tone gives the warm pop of orange without the primary-colour intensity.', ['linen', 'polo'])
       ],
       avoid: [
-        A('Black', '#111111', 'Dark on dark flattens into one murky block with no separation.'),
+        A('Black', '#111111', 'Dark on dark reads as one block unless the fabrics differ. Break it up with a lighter belt, shoes or watch.', true),
         A('Bright Cobalt', '#1F4FD8', 'A saturated blue next to navy looks like an accidental mismatch.'),
         A('Neon Orange', '#FF6A00', 'Pure primary orange overpowers navy’s muted tone.')
       ]
@@ -112,7 +112,7 @@
         R('Slate Teal', '#4F7C82', 'A cool blue-green gives clear contrast without brightness.', ['tee', 'linen'])
       ],
       avoid: [
-        A('Same-Shade Beige', '#C8B88A', 'Too close to the base reads as a failed match, not a deliberate tonal outfit.'),
+        A('Same-Shade Beige', '#C8B88A', 'Almost the same colour reads as a matching set. Go a clear step lighter or darker, or change the fabric.', true),
         A('Bright Mustard', '#E1AD01', 'Saturated yellow against sand blurs together and looks jaundiced.'),
         A('Neon Lime', '#B6FF00', 'A fluorescent green clashes with the soft, earthy base.')
       ]
@@ -138,7 +138,7 @@
       avoid: [
         A('Neon Green', '#39FF14', 'A fluorescent green makes muted olive look dull and dirty.'),
         A('Bright Red', '#D01F2A', 'Saturated red with olive tips into a festive or military look.'),
-        A('Mud Brown', '#6B5A3A', 'Brown at the same depth blends into a swampy, undefined mush.')
+        A('Mud Brown', '#6B5A3A', 'Brown at the same depth can blend into the olive. Pick a richer, warmer brown or add a lighter layer.', true)
       ]
     },
     charcoal: {
@@ -160,8 +160,8 @@
         R('Deep Teal', '#1F6F78', 'A rich blue-green gives colour without competing with charcoal’s depth.', ['knit', 'polo'])
       ],
       avoid: [
-        A('Black', '#111111', 'Black over charcoal looks like a washed-out mismatch rather than intentional.'),
-        A('Dull Brown', '#5A4632', 'Muddy brown against cool charcoal looks tired.'),
+        A('Black', '#111111', 'Both are dark, but charcoal is clearly lighter, so it works as a tonal look. Use different textures (matte chino, fine-knit black) and a lighter shoe or watch.', true),
+        A('Dull Brown', '#5A4632', 'Warm brown against cool grey can look flat. A rich, warm brown works better than a muddy one.', true),
         A('Fluoro Yellow', '#E6FF00', 'Harsh fluorescent colour overwhelms the quiet base.')
       ]
     },
@@ -184,7 +184,7 @@
         R('Forest Green', '#2F4F3A', 'A deep green provides clear, earthy contrast.', ['knit', 'polo'])
       ],
       avoid: [
-        A('Same-Shade Off-White', '#E6E0D0', 'A near-identical shade washes out and loses definition.'),
+        A('Same-Shade Off-White', '#E6E0D0', 'A near-identical shade loses definition. Change the fabric or add a darker shoe and belt to give it shape.', true),
         A('Pale Yellow', '#F2E8A0', 'A pastel yellow dissolves into stone and looks sallow.'),
         A('Pale Peach', '#F3D3B8', 'Peach drifts toward skin tone and looks washed out.')
       ]
@@ -208,8 +208,8 @@
         R('Rich Camel', '#B98B5A', 'Warm brown-orange gives a classic, sophisticated contrast.', ['knit', 'overshirt'])
       ],
       avoid: [
-        A('Dark Navy', '#1F2A44', 'Near-black navy beside black looks like an accidental mismatch.'),
-        A('Dark Chocolate', '#3B2A20', 'Very dark brown against black looks muddy and unresolved.'),
+        A('Dark Navy', '#1F2A44', 'Navy beside black can look like a near-miss in poor light. It works in daylight if the navy is clearly navy.', true),
+        A('Dark Chocolate', '#3B2A20', 'Very dark brown beside black is low contrast. It works with texture or a lighter accessory.', true),
         A('Washed Pastel Yellow', '#F3EBA8', 'A weak pastel looks sickly against such a hard base.')
       ]
     },
@@ -233,7 +233,7 @@
       ],
       avoid: [
         A('Bright Orange', '#FF7A00', 'Saturated orange fights tan and looks like a clash.'),
-        A('Muddy Brown', '#6B4A2E', 'Brown on brown without contrast swallows both pieces.'),
+        A('Muddy Brown', '#6B4A2E', 'Brown on brown needs contrast. Keep the top clearly lighter or darker than the bottoms.', true),
         A('Bright Mustard', '#E1AD01', 'Strong yellow against tan looks jaundiced and unrefined.')
       ]
     },
@@ -259,7 +259,7 @@
       avoid: [
         A('Bright Red', '#D01F2A', 'Red on red looks like a mismatched set.'),
         A('Hot Pink', '#FF2E93', 'Saturated pink makes burgundy look dull and heavy.'),
-        A('Dark Brown', '#4A2E24', 'Brown at the same depth turns muddy.')
+        A('Dark Brown', '#4A2E24', 'Brown at the same depth as burgundy can turn muddy. Go lighter, or add contrast with a lighter shoe.', true)
       ]
     },
     denim: {
@@ -281,7 +281,7 @@
         R('Soft Ochre', '#C9A24A', 'A golden yellow-orange sets off denim’s blue.', ['polo', 'tee'])
       ],
       avoid: [
-        A('Near-Match Blue', '#6F93C0', 'A blue close to the denim looks like an almost-match.'),
+        A('Near-Match Blue', '#6F93C0', 'A blue close to the denim can look like a double-denim set. Change the fabric or the shade to make it deliberate.', true),
         A('Neon Orange', '#FF6A00', 'Saturated orange fights faded blue and looks garish.'),
         A('Bright Royal Blue', '#1F4FD8', 'A strong, saturated blue overpowers washed denim.')
       ]
@@ -332,12 +332,12 @@
          rec(mk(h + 210, clamp(s, .26, .4), clamp(.52, .4, .62)), 'The other split-complement gives a second, softer contrast option.', ['linen', 'tee'])];
 
     const avoid = achro
-      ? [A('Near-Match Grey', mk(0, 0, clamp(l + .06, 0, 1)), 'Too close to the base reads as a mistake rather than a choice.'),
+      ? [A('Near-Match Grey', mk(0, 0, clamp(l + .06, 0, 1)), 'Too close to the base reads as a matching set. Change the fabric or go a clear step lighter or darker.', true),
          A('Neon Green', '#39FF14', 'Fluorescent colour overwhelms a quiet neutral base.'),
          A('Hot Pink', '#FF2E93', 'Extreme saturation looks harsh against a flat base.')]
-      : [A('Near-Match Shade', mk(h, s, clamp(l + (l > .5 ? -.06 : .06), 0, 1)), 'Almost the same colour looks like a failed match, not a deliberate pairing.'),
+      : [A('Near-Match Shade', mk(h, s, clamp(l + (l > .5 ? -.06 : .06), 0, 1)), 'Almost the same colour reads as a matching set. Change the fabric or go a clear step lighter or darker.', true),
          A('Neon ' + hueFamily(h + 180), mk(h + 180, 1, .5), 'A fluorescent opposite fights the base and makes it look dull.'),
-         dark ? A('Black', '#111111', 'Dark on dark flattens into a single block.')
+         dark ? A('Black', '#111111', 'Dark on dark reads as one block unless the fabrics differ. Break it up with a lighter belt, shoes or watch.', true)
               : A('Saturated ' + hueFamily(h), mk(h, 1, .45), 'A bright version of the base hue makes it look faded and cheap.')];
 
     const shoes = dark
@@ -414,28 +414,43 @@
   }
   const bottomFor = hex => { const n = nearestPalette(hex); return n.d < .15 ? BOTTOMS[n.key] : generateBottom(hex); };
 
-  const REL_LABEL = { classic: 'Safe pairing', tonal: 'Tonal pairing', comp: 'Contrast pairing', neutral: 'Judgement call', avoid: 'Avoid' };
-  const REL_SCORE = { classic: 3, tonal: 2.5, comp: 2, neutral: 1, avoid: 0 };
+  const REL_LABEL = { classic: 'Safe pairing', tonal: 'Tonal pairing', comp: 'Contrast pairing', neutral: 'Judgement call', care: 'Use with care', avoid: 'Avoid' };
+  const REL_SCORE = { classic: 3, tonal: 2.5, comp: 2, neutral: 1, care: .8, avoid: 0 };
+
+  function similar(a, b) {
+    const x = hexHsl(a), y = hexHsl(b);
+    const ax = x.s < .12, ay = y.s < .12;
+    if (ax !== ay) return false;
+    if (!ax) { let dh = Math.abs(x.h - y.h); dh = Math.min(dh, 360 - dh); if (dh > 35 || Math.abs(x.s - y.s) > .2) return false; }
+    return dist(a, b) < .14;
+  }
 
   function relate(topHex, bottom) {
     let best = { rel: null, d: 9, item: null };
     [['avoid', bottom.avoid], ['classic', bottom.neutrals], ['tonal', bottom.tonal], ['comp', bottom.comp]].forEach(([rel, list]) =>
-      list.forEach(item => { const d = dist(topHex, item.hex); if (d < best.d) best = { rel, d, item }; }));
-    if (best.d < .14) return { rel: best.rel, d: best.d, item: best.item, why: best.item.why };
+      list.forEach(item => {
+        const d = dist(topHex, item.hex);
+        if (d < best.d && similar(topHex, item.hex)) best = { rel: rel === 'avoid' && item.soft ? 'care' : rel, d, item };
+      }));
+    if (best.item) return { rel: best.rel, d: best.d, item: best.item, why: best.item.why };
     const t = hexHsl(topHex), b = hexHsl(bottom.hex), dl = Math.abs(t.l - b.l);
     const out = (rel, why) => ({ rel, d: best.d, item: null, why });
     if (t.s > .85 && t.l > .3 && t.l < .7) return out('avoid', 'A fully saturated colour overpowers the quieter base.');
+    let hd = Math.abs(t.h - b.h); hd = Math.min(hd, 360 - hd);
+    const bothDark = t.l < .32 && b.l < .32 && (t.s < .3 || (b.s >= .12 && hd < 45));
+    if (bothDark && dl >= .06) return out('care', 'Both are dark, so contrast is low. It works as a tonal look with different fabrics and a lighter belt, shoes or watch.');
     if (t.s < .12) {
       if (dl > .3) return out('classic', 'A neutral with clear value contrast against the base.');
-      if (dl < .12) return out('avoid', 'Too close in value to the base, so the two blur together.');
-      return out('neutral', 'A neutral that neither contrasts strongly nor matches; check it in daylight.');
+      if (dl < .12) return out('care', 'Close in value to the base, so the two can blur together. Change the fabric or add a lighter accessory.');
+      return out('neutral', 'A neutral that neither contrasts strongly nor matches. Check it in daylight.');
     }
-    if (b.s < .12) return dl < .1 ? out('avoid', 'Almost the same depth as the base, so it looks like a near-miss.') : out('comp', 'A coloured top reads as a deliberate accent on a neutral base.');
+    if (b.s < .12 && t.s >= .3 && t.l < .32 && b.l < .32) return out('comp', 'A rich, deep colour against a dark neutral gives depth without clashing.');
+    if (b.s < .12) return dl < .1 ? out('care', 'Almost the same depth as the base, so it can look like a near-miss. Change the fabric or add contrast.') : out('comp', 'A coloured top reads as a deliberate accent on a neutral base.');
     let dh = Math.abs(t.h - b.h); dh = Math.min(dh, 360 - dh);
-    if (dh < 14 && dl < .12) return out('avoid', 'Almost the same shade as the base, which looks like a failed match.');
+    if (dh < 14 && dl < .12) return out('care', 'Almost the same shade as the base, so it reads as a matching set. Change the fabric or go a clear step lighter or darker.');
     if (dh < 45) return out('tonal', 'Neighbouring hues keep the palette harmonious.');
     if (dh >= 130) return out('comp', 'Hues from opposite sides of the wheel give clear contrast.');
-    return out('neutral', 'Sits between tonal and contrast; try it and check in daylight.');
+    return out('neutral', 'Sits between tonal and contrast. Try it and check in daylight.');
   }
 
   /* ---------- Personal fit (skin / hair / season) ---------- */
@@ -639,7 +654,8 @@
         { id: 'tonal', title: 'Harmonious & Tonal', sub: 'Colour-wheel neighbours or shades of the base hue.', items: decorate(bottom.tonal) },
         { id: 'comp', title: 'Complementary Contrast', sub: 'Opposite or split-complement pairings, toned for menswear.', items: decorate(bottom.comp) }
       ],
-      avoid: bottom.avoid
+      avoid: bottom.avoid.filter(a => !a.soft),
+      care: bottom.avoid.filter(a => a.soft)
     };
   }
 
@@ -648,7 +664,7 @@
     const fm = formality === 'Relaxed Casual' ? 'relaxed' : 'smart';
     const clim = climate || 'mild';
     const hex = normHex(topHex) || '#FFFFFF';
-    const g = { classic: [], tonal: [], comp: [], neutral: [], avoid: [] };
+    const g = { classic: [], tonal: [], comp: [], neutral: [], care: [], avoid: [] };
     Object.entries(BOTTOMS).forEach(([k, b]) => {
       const r = relate(hex, b);
       const kinds = (r.item && r.item.kinds) || ['polo', 'oxford'];
@@ -661,6 +677,7 @@
       ['tonal', 'Tonal bottoms', 'Same family or neighbouring hues.'],
       ['comp', 'Contrast bottoms', 'Opposite-side colours, toned for menswear.'],
       ['neutral', 'Judgement calls', 'Not clearly good or bad. Try them in daylight.'],
+      ['care', 'Use with care', 'Low contrast or near-match. They can work with different fabrics or a lighter accessory.'],
       ['avoid', 'Bottoms to avoid', 'These clash with or wash out this top.']
     ];
     return {

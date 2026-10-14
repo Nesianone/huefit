@@ -120,3 +120,9 @@ button:focus-visible,input:focus-visible{outline:3px solid #7A8FC7;outline-offse
 .seg.wrapseg button{flex:0 1 auto}
 .shoenote{color:var(--warn);font-size:.8rem}
 .tip.buy{background:#FFF3D6}
+
+.avoid.care{background:#FFF6E0}
+.avoid.care .item{border-bottom-color:#F0E2B8}
+.avoid.care .sw::after{content:"";}
+.avoid.care span{color:#5b4f2a}
+.badge.rel-care{background:#FFF0C7;color:#7A5200}

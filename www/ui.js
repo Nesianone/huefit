@@ -148,7 +148,7 @@
   function badges(note, ownedName) {
     let h = '';
     if (note === 'flatter') h += '<span class="badge good">Flatters you</span>';
-    if (note === 'wash') h += '<span class="badge warn">May wash you out</span>';
+    if (note === 'wash') h += '<span class="badge warn">Low contrast with your skin</span>';
     if (ownedName) h += `<span class="badge own">You own: ${esc(ownedName)}</span>`;
     return h ? `<div class="badges">${h}</div>` : '';
   }
@@ -174,7 +174,9 @@
     let h = `<div class="summary"><span class="big" style="background:${res.bottom.hex}"></span>
       <div><h2>${esc(res.bottom.name)} ${esc(res.garment.toLowerCase())}</h2><p>${esc(res.formality)} · ${res.bottom.hex}</p></div></div>${rankBanner(res.ranked)}`;
     res.categories.forEach(c => { h += `<h2>${esc(c.title)}</h2><p class="sub">${esc(c.sub)}</p><div class="grid">${c.items.map(i => topCard(i, res)).join('')}</div>`; });
-    h += `<h2>Colours to Avoid</h2><p class="sub">These clash with, or wash out, your bottoms.</p><div class="avoid">` +
+    if (res.care.length) h += `<h2>Use with care</h2><p class="sub">Low contrast or near-match. These can work if you handle them well.</p><div class="avoid care">` +
+      res.care.map(a => `<div class="item"><span class="sw" style="background:${a.hex}"></span><div><strong>${esc(a.name)}</strong><span>${esc(a.why)}</span></div></div>`).join('') + '</div>';
+    h += `<h2>Colours to Avoid</h2><p class="sub">These clash with your bottoms.</p><div class="avoid">` +
       res.avoid.map(a => `<div class="item"><span class="sw" style="background:${a.hex}"></span><div><strong>${esc(a.name)}</strong><span>${esc(a.why)}</span></div></div>`).join('') + '</div>';
     if (res.tip) h += `<div class="tip"><b>Fit tip:</b> ${esc(res.tip)}</div>`;
     $('outfitsResults').innerHTML = h;
@@ -198,12 +200,12 @@
     const t = state.top.key ? E.TOPS.find(x => x.key === state.top.key) : { name: null, hex: state.top.hex };
     const res = E.recommendBottoms({ topHex: t.hex, topName: t.name, garment: state.garment, formality: state.formality, profile, season: profile.season, climate: profile.climate, ownedShoes: shoes, ownedBelts: belts, ownedWatches: watches });
     const fitNote = res.fit.note === 'flatter' ? '<div class="tip good"><b>Flatters you:</b> this top has strong contrast with your skin tone.</div>'
-      : res.fit.note === 'wash' ? '<div class="tip warn-tip"><b>Heads up:</b> this top is close to your skin tone in depth and may wash you out near your face.</div>' : '';
+      : res.fit.note === 'wash' ? '<div class="tip warn-tip"><b>Heads up:</b> this top is close to your skin tone in depth, so it may look flat near your face.</div>' : '';
     let h = `<div class="summary"><span class="big" style="background:${res.top.hex}"></span>
       <div><h2>Bottoms for ${esc(res.top.name)}</h2><p>${esc(res.formality)} · ${esc(res.garment.toLowerCase())} · ${res.top.hex}</p></div></div>${fitNote}`;
     res.groups.forEach(g => {
-      if (g.id === 'avoid') {
-        h += `<h2>${esc(g.title)}</h2><p class="sub">${esc(g.sub)}</p><div class="avoid">` + g.items.map(a => `<div class="item"><span class="sw" style="background:${a.hex}"></span><div><strong>${esc(a.name)}</strong><span>${esc(a.why)}</span></div></div>`).join('') + '</div>';
+      if (g.id === 'avoid' || g.id === 'care') {
+        h += `<h2>${esc(g.title)}</h2><p class="sub">${esc(g.sub)}</p><div class="avoid${g.id === 'care' ? ' care' : ''}">` + g.items.map(a => `<div class="item"><span class="sw" style="background:${a.hex}"></span><div><strong>${esc(a.name)}</strong><span>${esc(a.why)}</span></div></div>`).join('') + '</div>';
       } else {
         h += `<h2>${esc(g.title)}</h2><p class="sub">${esc(g.sub)}</p><div class="grid">${g.items.map(i => bottomCard(i, res)).join('')}</div>`;
       }
@@ -214,7 +216,7 @@
 
   /* ---------- Wardrobe tab ---------- */
   const wForm = { kind: 'top', hex: null, name: '' };
-  const REL_CHIP = { classic: 'Great', tonal: 'Great', comp: 'Good', neutral: 'OK', avoid: 'Avoid' };
+  const REL_CHIP = { classic: 'Great', tonal: 'Great', comp: 'Good', neutral: 'OK', care: 'Careful', avoid: 'Avoid' };
   function renderWardrobe() {
     const list = (arr, kind) => arr.length ? arr.map((x, i) => `<button class="fav-chip" data-wdel="${kind}:${i}" aria-label="Remove ${esc(x.name)}"><span class="mini one" aria-hidden="true"><i style="background:${x.hex}"></i></span><span>${esc(x.name)}</span><span aria-hidden="true">✕</span></button>`).join('') : '<p class="sub">None yet.</p>';
     let h = `<h2>Your tops</h2><div class="chips">${list(wardrobe.tops, 'tops')}</div><h2>Your bottoms</h2><div class="chips">${list(wardrobe.bottoms, 'bottoms')}</div>`;
